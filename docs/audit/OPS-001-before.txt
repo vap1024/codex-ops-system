@@ -1,0 +1,10 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+________________ test_indented_heading_remains_inside_decision ________________
+tests\test_package.py:18: in test_indented_heading_remains_inside_decision
+    assert len(items) == 2
+E   AssertionError: assert 1 == 2
+E    +  where 1 = len((DecisionItem(goal_id='G-AUDIT', title='Synthetic nested-heading regression', source='nested-heading.md', line=8, text='Preserve the evidence for the first request.'),))
+=========================== short test summary info ===========================
+FAILED tests/test_package.py::test_indented_heading_remains_inside_decision
+1 failed in 0.14s

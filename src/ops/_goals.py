@@ -67,6 +67,12 @@ def _decisions(lines: list[str], start: int, path: Path) -> tuple[tuple[str, int
                 current.append(line)
             continue
 
+        # An indented heading is part of the current list item. Check list
+        # continuation before looking for a new top-level section.
+        if active and current and line.startswith((" ", "\t")):
+            current.append(line)
+            continue
+
         heading = _HEADING.match(line)
         if heading and len(heading[1]) <= 2:
             finish()
@@ -86,8 +92,6 @@ def _decisions(lines: list[str], start: int, path: Path) -> tuple[tuple[str, int
         elif not line.strip():
             if current:
                 current.append("")
-        elif current and line.startswith((" ", "\t")):
-            current.append(line)
         else:
             raise GoalFormatError(
                 f"{path.name}:{index + 1}: decisions must be top-level list items; "
