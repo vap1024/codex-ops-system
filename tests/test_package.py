@@ -200,6 +200,7 @@ def test_demo_runs_from_another_working_directory(tmp_path):
              if line.startswith(("Decision package: ", "Stale report: "))]
     assert len(paths) == 2
     assert all(path.is_file() for path in paths)
+    assert all("Demo data: synthetic fixtures" in path.read_text() for path in paths)
     assert paths[0].parent == paths[1].parent
     # The public demo retains its reports. This test removes only its own run.
     for path in paths:
@@ -218,15 +219,23 @@ def test_demo_accepts_explicit_output_directory(tmp_path):
     assert "Stale goals: 1" in (output / "STALE-GOALS.md").read_text()
 
 
+def test_synthetic_marker_is_explicit_for_decision_packages(demo_goals, tmp_path, as_of):
+    labeled = build_package(demo_goals, tmp_path / "demo.md", as_of=as_of, synthetic=True)
+    ordinary = build_package(demo_goals, tmp_path / "ordinary.md", as_of=as_of)
+    assert "Demo data: synthetic fixtures" in labeled.path.read_text()
+    assert "Demo data: synthetic fixtures" not in ordinary.path.read_text()
+
+
 @pytest.mark.parametrize("module", ["ops.package", "ops.stale"])
 def test_module_cli_writes_report_and_handles_invalid_input(module, tmp_path, demo_goals):
     env = {**os.environ, "PYTHONPATH": str(ROOT / "src")}
     output = tmp_path / "report.md"
     command = [sys.executable, "-m", module, str(demo_goals), "--output", str(output),
-               "--as-of", "2026-10-24"]
+               "--as-of", "2026-10-24", "--synthetic"]
     run = subprocess.run(command, env=env, capture_output=True, text=True)
     assert run.returncode == 0, run.stderr
     content = output.read_text()
+    assert "Demo data: synthetic fixtures" in content
     assert ("Decision items: 3" if module == "ops.package" else "Stale goals: 1") in content
     failed = subprocess.run(
         [sys.executable, "-m", module, str(tmp_path / "missing")],

@@ -37,6 +37,7 @@ def collect_decisions(folder: str | Path) -> tuple[DecisionItem, ...]:
 
 def build_package(
     folder: str | Path, output: str | Path, *, as_of: date | None = None,
+    synthetic: bool = False,
 ) -> PackageResult:
     """Validate every goal before replacing the output; never approve a request."""
     goals = read_goals(folder)
@@ -46,7 +47,12 @@ def build_package(
     )
     report_date = as_of if as_of is not None else date.today()
     lines = [
-        "# Daily decision package", "", f"As of: {report_date.isoformat()}",
+        "# Daily decision package", "",
+    ]
+    if synthetic:
+        lines += ["Demo data: synthetic fixtures", ""]
+    lines += [
+        f"As of: {report_date.isoformat()}",
         f"Goals scanned: {len(goals)}", f"Decision items: {len(items)}", "",
         "These are pending requests. This package does not record approval or acceptance.", "",
     ]
@@ -69,9 +75,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("goals", type=Path, help="flat folder containing goal Markdown")
     parser.add_argument("--output", type=Path, default=Path("DECISION-PACKAGE.md"))
     parser.add_argument("--as-of", type=iso_date, default=None, metavar="YYYY-MM-DD")
+    parser.add_argument("--synthetic", action="store_true", help="label a synthetic demonstration")
     args = parser.parse_args(argv)
     try:
-        result = build_package(args.goals, args.output, as_of=args.as_of)
+        result = build_package(args.goals, args.output, as_of=args.as_of, synthetic=args.synthetic)
     except (OSError, ValueError) as exc:
         parser.exit(2, f"error: {exc}\n")
     print(f"{len(result.items)} decision items from {result.goal_count} goals -> {result.path}")

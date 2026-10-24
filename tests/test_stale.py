@@ -14,6 +14,10 @@ def test_demo_marks_only_the_old_goal(demo_goals, as_of):
     assert stale[0].source == "02-archive-review.md"
     assert stale[0].age_days == 53
     assert stale[0].updated.isoformat() == "2026-09-01"
+    # The third goal is deliberately on the fresh/stale boundary.
+    from ops._goals import read_goal
+    boundary = read_goal(demo_goals / "03-format-check.md")
+    assert (as_of - boundary.updated).days == 14
 
 
 @pytest.mark.parametrize("age,is_stale", [(0, False), (13, False), (14, False), (15, True), (50, True)])
@@ -80,6 +84,15 @@ def test_empty_stale_report(goal_factory, tmp_path, as_of):
     output = tmp_path / "report.md"
     assert write_stale_report(goal.parent, output, as_of=as_of) == ()
     assert "No stale goals." in output.read_text()
+
+
+def test_synthetic_marker_is_explicit_for_stale_reports(demo_goals, tmp_path, as_of):
+    demo = tmp_path / "demo.md"
+    ordinary = tmp_path / "ordinary.md"
+    write_stale_report(demo_goals, demo, as_of=as_of, synthetic=True)
+    write_stale_report(demo_goals, ordinary, as_of=as_of)
+    assert "Demo data: synthetic fixtures" in demo.read_text()
+    assert "Demo data: synthetic fixtures" not in ordinary.read_text()
 
 
 def test_stale_report_cannot_modify_source_goal(goal_factory, as_of):
