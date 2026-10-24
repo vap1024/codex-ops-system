@@ -13,6 +13,14 @@ from ops.package import build_package, collect_decisions
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_indented_heading_remains_inside_decision():
+    items = collect_decisions(ROOT / "docs" / "audit" / "fixtures")
+    assert len(items) == 2
+    assert "  ## Evidence" in items[0].text
+    assert "This indented heading belongs to the first decision." in items[0].text
+    assert items[1].text == "Keep the second request in the package."
+
+
 def test_demo_package_has_three_ordered_items(demo_goals, tmp_path, as_of):
     output = tmp_path / "DECISION-PACKAGE.md"
     result = build_package(demo_goals, output, as_of=as_of)
