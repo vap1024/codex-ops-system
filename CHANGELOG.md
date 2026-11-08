@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Correct the README's pre-publication status notes: this repository and its v0.1.0 release were published on 2026-10-25, and the cross-linked repositories are published with green CI.
+- Add a subprocess CLI regression test for a negative stale threshold (`--days -1` exits 2 with a clean error and no traceback).
+
 ## v0.1.0 - prepared on 2026-10-24
 
 - Add frozen-brief, source-review, and on-disk acceptance protocols and four templates.

@@ -55,9 +55,9 @@ python -m pip install -r codex-ops-system/requirements.txt
 python codex-ops-system/examples/run_demo.py
 ```
 
-The hosted clone is a publication target for **2026-10-27**. Until publication,
-use the delivered local repository; a fresh local Git clone was verified.
-GitHub CI, release, and hosted cross-links remain pending publication.
+This repository is [published on GitHub](https://github.com/vap1024/codex-ops-system),
+with the [v0.1.0 release](https://github.com/vap1024/codex-ops-system/releases/tag/v0.1.0).
+CI runs on GitHub Actions; the local-clone instructions above are the normal way in.
 
 The demo prints paths to two reports retained in a new OS temporary folder
 (`/tmp` on Linux, `%TEMP%` on Windows). It fixes the reference date at 2026-10-24
@@ -73,11 +73,11 @@ From the repository root, after installing `requirements.txt`:
 python -m pytest
 ```
 
-Actual local result: **53 passed** on Python 3.13.15 with pytest 9.1.1.
+Actual local result: **54 passed**.
 The suite covers numbering, empty and absent sections, nested headings and
 fences, invalid metadata, unchanged sources, synthetic labeling, CLI behavior,
-and stale-date boundaries. The single CI job targets Ubuntu and Python 3.11;
-no hosted CI result is claimed before it runs.
+and stale-date boundaries. The CI job runs on GitHub Actions (Ubuntu, Python
+3.11); the badge at the top of this README shows its current status.
 
 ## How Codex is used
 
