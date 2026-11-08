@@ -1,10 +1,16 @@
 from datetime import timedelta
 import os
+from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
 from ops._goals import GoalFormatError
 from ops.stale import find_stale_goals, main, write_stale_report
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_demo_marks_only_the_old_goal(demo_goals, as_of):
@@ -109,3 +115,17 @@ def test_cli_rejects_invalid_reference_dates(demo_goals, date_text, capsys):
         main([str(demo_goals), "--as-of", date_text])
     assert error.value.code == 2
     assert "error:" in capsys.readouterr().err
+
+
+def test_module_cli_rejects_negative_days(demo_goals, tmp_path):
+    env = {**os.environ, "PYTHONPATH": str(ROOT / "src")}
+    output = tmp_path / "report.md"
+    run = subprocess.run(
+        [sys.executable, "-m", "ops.stale", str(demo_goals), "--days", "-1",
+         "--output", str(output)],
+        env=env, capture_output=True, text=True,
+    )
+    assert run.returncode == 2
+    assert "error:" in run.stderr
+    assert "Traceback" not in run.stderr
+    assert not output.exists()
